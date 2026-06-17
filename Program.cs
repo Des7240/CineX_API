@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using Scalar.AspNetCore;
 
+// Kích hoạt tính năng hỗ trợ DateTime (Local/Unspecified) trên PostgreSQL
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Load biến môi trường từ file .env
