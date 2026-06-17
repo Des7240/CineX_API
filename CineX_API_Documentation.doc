@@ -1,0 +1,126 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>CineX API Documentation</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; }
+    h1 { color: #2C3E50; text-align: center; }
+    h2 { color: #34495E; border-bottom: 1px solid #BDC3C7; padding-bottom: 5px; margin-top: 30px; }
+    h3 { color: #2980B9; }
+    ul { margin-bottom: 15px; }
+    li { margin-bottom: 5px; }
+    code { background-color: #F4F6F7; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; color: #C0392B; }
+    .highlight { background-color: #ECF0F1; padding: 10px; border-left: 4px solid #3498DB; margin: 15px 0; }
+</style>
+</head>
+<body>
+
+<h1>TÀI LIỆU HƯỚNG DẪN SỬ DỤNG VÀ TÍCH HỢP CINEX API</h1>
+
+<h2>1. TỔNG QUAN CÔNG NGHỆ (TECH STACK)</h2>
+<ul>
+    <li><strong>Framework</strong>: .NET 9.0 (ASP.NET Core Web API)</li>
+    <li><strong>Database</strong>: PostgreSQL (Được host trên Neon.tech)</li>
+    <li><strong>ORM</strong>: Entity Framework Core 9</li>
+    <li><strong>Kiến trúc API</strong>: RESTful API kết hợp OData v4 (Cho phép linh hoạt query: <code>$filter</code>, <code>$select</code>, <code>$expand</code>)</li>
+    <li><strong>Lưu trữ file</strong>: Cloudflare R2 (S3-Compatible) thông qua AWSSDK.S3</li>
+    <li><strong>Tài liệu API (UI)</strong>: Scalar (Công cụ mặc định mới thay thế Swagger trên .NET 9)</li>
+    <li><strong>Môi trường</strong>: Quản lý bằng biến môi trường (File <code>.env</code> trên local, Environment Variables trên server Render).</li>
+</ul>
+
+<h2>2. DANH SÁCH ENDPOINT API (ENDPOINT LIST)</h2>
+<div class="highlight">
+    <strong>Base URL trên môi trường Production:</strong> <code>https://cinex-api.onrender.com</code>
+</div>
+
+<h3>2.1. Quản lý Dự án (Projects)</h3>
+<ul>
+    <li><code>GET /odata/Projects</code>: Lấy danh sách dự án.</li>
+    <li><code>POST /odata/Projects</code>: Tạo mới một dự án.</li>
+    <li><code>GET /odata/Projects?$expand=Acts</code>: Lấy dự án kèm theo danh sách các hồi (Acts).</li>
+</ul>
+
+<h3>2.2. Quản lý Hồi (Acts)</h3>
+<ul>
+    <li><code>GET /odata/Acts</code>: Lấy danh sách hồi.</li>
+    <li><code>POST /odata/Acts</code>: Thêm mới hồi vào kịch bản.</li>
+</ul>
+
+<h3>2.3. Quản lý Phân cảnh (Scenes)</h3>
+<ul>
+    <li><code>GET /odata/Scenes</code>: Lấy tất cả phân cảnh.</li>
+    <li><code>POST /odata/Scenes</code>: Tạo phân cảnh mới.</li>
+    <li><code>GET /odata/Scenes?$expand=Location,SceneCharacters($expand=Character)</code>: Lấy dữ liệu đầy đủ của phân cảnh (Bao gồm chi tiết bối cảnh và danh sách diễn viên). Rất thích hợp để render giao diện Dashboard.</li>
+</ul>
+
+<h3>2.4. Quản lý Nhân vật (Characters)</h3>
+<ul>
+    <li><code>GET /odata/Characters</code>: Lấy danh sách nhân vật.</li>
+    <li><code>POST /odata/Characters</code>: Tạo mới nhân vật.</li>
+</ul>
+
+<h3>2.5. Quản lý Bối cảnh (Locations)</h3>
+<ul>
+    <li><code>GET /odata/Locations</code>: Lấy danh sách bối cảnh.</li>
+    <li><code>POST /odata/Locations</code>: Tạo mới bối cảnh.</li>
+</ul>
+
+<h3>2.6. Upload File (Hình ảnh Poster/Avatar)</h3>
+<ul>
+    <li><code>POST /api/FileUpload/upload</code>:
+        <ul>
+            <li><strong>Body (form-data)</strong>: 
+                <ul>
+                    <li><code>file</code>: (File ảnh từ máy tính)</li>
+                    <li><code>prefix</code>: (Chuỗi - ví dụ: "poster" hoặc "avatar")</li>
+                </ul>
+            </li>
+            <li><strong>Kết quả trả về</strong>: JSON chứa URL public của file ảnh trên Cloudflare R2 để bạn lưu vào database (Trường <code>PosterUrl</code> hoặc <code>ImageUrl</code>).</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>2.7. Cập nhật và Xóa dữ liệu (Update & Delete)</h3>
+<ul>
+    <li>Hệ thống <strong>đã hỗ trợ đầy đủ</strong> việc cập nhật và xóa cho tất cả các bảng (Projects, Acts, Scenes, Characters, Locations) thông qua các method tiêu chuẩn của OData. Cấu trúc dùng chung cho mọi bảng như sau:</li>
+    <li><strong>Cập nhật (PATCH)</strong>: <code>PATCH /odata/TênBảng(ID)</code>
+        <ul>
+            <li><em>Ví dụ</em>: <code>PATCH /odata/Projects(1)</code></li>
+            <li><em>Cách dùng</em>: Gửi JSON body chứa <strong>chỉ những trường bạn muốn thay đổi</strong>. Không cần gửi lại toàn bộ object. (VD: <code>{"Title": "Tên phim mới"}</code>).</li>
+        </ul>
+    </li>
+    <li><strong>Xoá (DELETE)</strong>: <code>DELETE /odata/TênBảng(ID)</code>
+        <ul>
+            <li><em>Ví dụ</em>: <code>DELETE /odata/Projects(1)</code></li>
+            <li><em>Lưu ý an toàn</em>: Database đã cài đặt cơ chế <strong>Cascade Delete</strong>. Nghĩa là nếu bạn xoá 1 Project, tất cả các Hồi (Act) và Phân cảnh (Scene) thuộc Project đó sẽ tự động bị dọn dẹp sạch sẽ!</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>3. HƯỚNG DẪN KIỂM TRA (HOW TO TEST)</h2>
+
+<h3>Cách 1: Sử dụng giao diện tài liệu trực quan (Scalar UI)</h3>
+<ul>
+    <li>Mở trình duyệt và truy cập: <code>https://cinex-api.onrender.com/scalar/v1</code></li>
+    <li>Giao diện này cung cấp danh sách toàn bộ Endpoints. Bạn có thể bấm vào từng endpoint và chọn <strong>"Test Request"</strong> để gửi lệnh trực tiếp trên trình duyệt mà không cần cài phần mềm thứ 3.</li>
+</ul>
+
+<h3>Cách 2: Sử dụng Postman (Khuyên dùng)</h3>
+<ul>
+    <li>Tôi đã cung cấp sẵn file <code>CineX_Postman_Collection.json</code> đính kèm trong Project.</li>
+    <li><strong>Bước 1</strong>: Mở ứng dụng Postman.</li>
+    <li><strong>Bước 2</strong>: Bấm nút <strong>Import</strong> góc trên bên trái, kéo file JSON trên thả vào.</li>
+    <li><strong>Bước 3</strong>: Một thư mục "CineX API (Production)" sẽ xuất hiện chứa sẵn toàn bộ các mẫu Request có điền sẵn Body minh hoạ.</li>
+    <li><strong>Bước 4</strong>: Chọn Request bạn muốn test và bấm <strong>Send</strong>. (Đối với API Upload File, hãy chọn thẻ Body -> form-data -> click vào Value chuyển sang chọn File từ máy).</li>
+</ul>
+
+<h2>4. LƯU Ý KHI TÍCH HỢP FRONTEND</h2>
+<ul>
+    <li>Hệ thống hiện tại đang được cấu hình dạng <strong>Open API</strong> (Không yêu cầu truyền Token ở Header).</li>
+    <li>Khi gọi dữ liệu (Lấy danh sách), dùng <code>HTTP GET</code>.</li>
+    <li>Khi gửi dữ liệu (Tạo mới bảng), dùng <code>HTTP POST</code> và set Header <code>Content-Type: application/json</code>.</li>
+    <li><strong>Mẹo Tối Ưu</strong>: Khi cần lấy thông tin nối bảng (Ví dụ lấy Scene kèm Location), hãy tận dụng sức mạnh của OData bằng cách thêm parameter <code>?$expand=TênBảng</code> vào URL. Điều này giúp frontend giảm thiểu số lượng HTTP Request xuống chỉ còn 1 lần duy nhất!</li>
+</ul>
+
+</body>
+</html>

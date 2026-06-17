@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "b182a392-1cf7-4f68-b7eb-123456789abc",
+		"name": "CineX API (Production)",
+		"description": "Bộ test API đầy đủ cho dự án CineX sau khi deploy lên Render",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Projects",
+			"item": [
+				{
+					"name": "Get All Projects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Projects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Projects"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Title\": \"Mật Danh X\",\n    \"Genre\": \"Hành động\",\n    \"Description\": \"Dự án phim điện ảnh bom tấn 2026\",\n    \"StartDate\": \"2026-01-01T00:00:00Z\",\n    \"PosterUrl\": \"https://link-anh-demo.com/poster.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/odata/Projects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Projects"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Projects with Acts (Expand)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Projects?$expand=Acts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Projects"
+							],
+							"query": [
+								{
+									"key": "$expand",
+									"value": "Acts"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Acts",
+			"item": [
+				{
+					"name": "Get All Acts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Acts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Acts"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Act",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ProjectId\": 1,\n    \"SequenceOrder\": 1,\n    \"Title\": \"Hồi 1: Mở đầu\",\n    \"Summary\": \"Giới thiệu bối cảnh và nam chính\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/odata/Acts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Acts"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Characters",
+			"item": [
+				{
+					"name": "Get All Characters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Characters",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Characters"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Character",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\": \"Nam\",\n    \"Role\": \"MAIN\",\n    \"ActorName\": \"Trấn Thành\",\n    \"Description\": \"Nhân vật nam chính, nghề nghiệp điệp viên\",\n    \"CastingStatus\": \"APPROVED\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/odata/Characters",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Characters"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Locations",
+			"item": [
+				{
+					"name": "Get All Locations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Locations"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\": \"Căn hộ chung cư\",\n    \"Setting\": \"INT\",\n    \"Time\": \"NIGHT\",\n    \"Address\": \"Quận 2, TP.HCM\",\n    \"Notes\": \"Cần chuẩn bị đèn neon hắt sáng xanh\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/odata/Locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Locations"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Scenes",
+			"item": [
+				{
+					"name": "Get All Scenes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Scenes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Scenes"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Scene",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ActId\": 1,\n    \"LocationId\": 1,\n    \"SceneNumber\": \"1A\",\n    \"Title\": \"Đêm định mệnh\",\n    \"Setting\": \"INT\",\n    \"Time\": \"NIGHT\",\n    \"Status\": \"TODO\",\n    \"Summary\": \"Phân cảnh nam chính phát hiện vali bị mất\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/odata/Scenes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Scenes"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Scenes with Full Relations (Dashboard View)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/odata/Scenes?$expand=Location,SceneCharacters($expand=Character)",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"odata",
+								"Scenes"
+							],
+							"query": [
+								{
+									"key": "$expand",
+									"value": "Location,SceneCharacters($expand=Character)"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. File Upload (Cloudflare R2)",
+			"item": [
+				{
+					"name": "Upload Image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "prefix",
+									"value": "poster",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/FileUpload/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"FileUpload",
+								"upload"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://cinex-api.onrender.com",
+			"type": "string"
+		}
+	]
+}

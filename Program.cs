@@ -14,6 +14,15 @@ Env.Load();
 
 // 2. Cấu hình DbContext (PostgreSQL Neon)
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Xử lý chuỗi kết nối dạng URI (postgres://...) để tương thích hoàn hảo với EF Core / Npgsql
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={(uri.Port > 0 ? uri.Port : 5432)};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true;";
+}
+
 builder.Services.AddDbContext<CineXDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -45,14 +54,27 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// --- TỰ ĐỘNG APPLY MIGRATIONS KHI KHỞI ĐỘNG (Quan trọng khi deploy Render) ---
+using (var scope = app.Services.CreateScope())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference(options => {
-        options.WithTitle("CineX API Documentation");
-    });
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<CineXDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Migration Error: {ex.Message}");
+    }
 }
+
+// Configure the HTTP request pipeline.
+// Đã tắt if (app.Environment.IsDevelopment()) để cho phép xem tài liệu API trên Render (Production)
+app.MapOpenApi();
+app.MapScalarApiReference(options => {
+    options.WithTitle("CineX API Documentation");
+});
 
 app.UseHttpsRedirection();
 
