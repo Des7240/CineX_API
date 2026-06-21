@@ -39,8 +39,9 @@ modelBuilder.EntitySet<Act>("Acts");
 modelBuilder.EntitySet<Location>("Locations");
 modelBuilder.EntitySet<Character>("Characters");
 modelBuilder.EntitySet<Scene>("Scenes");
-// Không cần EntitySet cho bảng trung gian SceneCharacter nếu không truy vấn trực tiếp
-
+var sceneCharacterBuilder = modelBuilder.EntitySet<SceneCharacter>("SceneCharacters");
+sceneCharacterBuilder.EntityType.HasKey(sc => sc.SceneId);
+sceneCharacterBuilder.EntityType.HasKey(sc => sc.CharacterId);
 builder.Services.AddControllers()
     .AddOData(options => options
         .Select()
@@ -54,6 +55,18 @@ builder.Services.AddControllers()
 // Cấu hình OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+// Thêm CORS để cho phép client gọi API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        corsBuilder =>
+        {
+            corsBuilder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+        });
+});
 
 var app = builder.Build();
 
@@ -80,6 +93,9 @@ app.MapScalarApiReference(options => {
 });
 
 app.UseHttpsRedirection();
+
+// Kích hoạt CORS
+app.UseCors("AllowAll");
 
 // Open API - Tạm thời chưa có Authentication/Authorization theo yêu cầu của user
 app.UseAuthorization();

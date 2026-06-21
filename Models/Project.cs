@@ -16,10 +16,23 @@ public class Project
     public string? Genre { get; set; }
     
     public string? Description { get; set; }
+
+    public string? Director { get; set; }
     
     public DateTime? StartDate { get; set; }
+
+    public DateTime? EndDate { get; set; }
     
     public string? PosterUrl { get; set; }
+
+    /// <summary>Tiến độ từ 0.0 đến 1.0</summary>
+    public double Progress { get; set; } = 0.0;
+
+    /// <summary>PLANNING / SHOOTING / POST_PRODUCTION / COMPLETED</summary>
+    public string Status { get; set; } = "PLANNING";
+
+    /// <summary>Số lượng thành viên đoàn phim</summary>
+    public int CrewCount { get; set; } = 0;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

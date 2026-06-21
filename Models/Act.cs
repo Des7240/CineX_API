@@ -21,6 +21,9 @@ public class Act
 
     public string? Summary { get; set; }
 
+    /// <summary>WAITING / IN_PROGRESS / DONE</summary>
+    public string Status { get; set; } = "WAITING";
+
     // Navigation properties
     [ForeignKey(nameof(ProjectId))]
     public virtual Project? Project { get; set; }
